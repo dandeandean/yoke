@@ -79,12 +79,12 @@ func VerifyModule(keys PublicKeySet, wasm []byte) error {
 		return rsa.VerifyPSS(key, crypto.SHA256, internal.SHA256(wasm), payload.Signature, nil)
 	case *ecdsa.PublicKey:
 		if !ecdsa.VerifyASN1(key, internal.SHA256(wasm), payload.Signature) {
-			return fmt.Errorf("failed to verify signature")
+			return fmt.Errorf("invalid signature")
 		}
 		return nil
 	case ed25519.PublicKey:
 		if !ed25519.Verify(key, internal.SHA256(wasm), payload.Signature) {
-			return fmt.Errorf("failed to verify signature")
+			return fmt.Errorf("invalid signature")
 		}
 		return nil
 	default:
