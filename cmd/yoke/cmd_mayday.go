@@ -45,7 +45,7 @@ func init() {
 	CmdRoot.AddCommand(CmdMayday)
 }
 
-func GetMaydayParams(settings GlobalSettings, args []string) (*MaydayParams, error) {
+func GetMaydayParams(_ GlobalSettings, args []string) (*MaydayParams, error) {
 	flagset := CmdMayday.FlagSet
 
 	params := MaydayParams{GlobalSettings: settings}

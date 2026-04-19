@@ -49,7 +49,7 @@ type DescentParams struct {
 	yoke.DescentParams
 }
 
-func GetDescentfParams(settings GlobalSettings, args []string) (*DescentParams, error) {
+func GetDescentfParams(_ GlobalSettings, args []string) (*DescentParams, error) {
 	flagset := CmdDescent.FlagSet
 
 	descentParams.GlobalSettings = settings

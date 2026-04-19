@@ -38,7 +38,7 @@ func init() {
 	CmdRoot.AddCommand(CmdATC)
 }
 
-func GetAtcParams(settings GlobalSettings, args []string) ATCParams {
+func GetAtcParams(_ GlobalSettings, args []string) ATCParams {
 	flagset := CmdATC.FlagSet
 	atcParams.GlobalSettings = settings
 	RegisterGlobalFlags(flagset, &atcParams.GlobalSettings)

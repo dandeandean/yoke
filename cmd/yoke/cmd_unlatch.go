@@ -39,7 +39,7 @@ func init() {
 	CmdRoot.AddCommand(CmdUnlatch)
 }
 
-func GetUnlatchParams(settings GlobalSettings, args []string) (*UnlatchParams, error) {
+func GetUnlatchParams(_ GlobalSettings, args []string) (*UnlatchParams, error) {
 	flagset := CmdUnlatch.FlagSet
 
 	unlatchParams.GlobalSettings = settings

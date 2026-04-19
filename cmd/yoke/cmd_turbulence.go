@@ -53,7 +53,7 @@ func init() {
 	CmdRoot.AddCommand(CmdTurbulence)
 }
 
-func GetTurbulenceParams(settings GlobalSettings, args []string) (*TurbulenceParams, error) {
+func GetTurbulenceParams(_ GlobalSettings, args []string) (*TurbulenceParams, error) {
 	flagset := CmdTurbulence.FlagSet
 
 	turbulencParams.GlobalSettings = settings

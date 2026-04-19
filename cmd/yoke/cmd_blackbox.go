@@ -53,7 +53,7 @@ func init() {
 	CmdRoot.AddCommand(CmdBlackbox)
 }
 
-func GetBlackBoxParams(settings GlobalSettings, args []string) (*BlackboxParams, error) {
+func GetBlackBoxParams(_ GlobalSettings, args []string) (*BlackboxParams, error) {
 	flagset := CmdBlackbox.FlagSet
 
 	blackboxParams.GlobalSettings = settings

@@ -83,7 +83,7 @@ func init() {
 	CmdRoot.AddCommand(CmdTakeoff)
 }
 
-func GetTakeoffParams(settings GlobalSettings, source io.Reader, args []string) (*TakeoffParams, error) {
+func GetTakeoffParams(_ GlobalSettings, source io.Reader, args []string) (*TakeoffParams, error) {
 	flagset := CmdTakeoff.FlagSet
 	takeoffParams.TakeoffParams.Flight = yoke.FlightParams{Input: source}
 	RegisterGlobalFlags(flagset, &takeoffParams.GlobalSettings)

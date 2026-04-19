@@ -69,14 +69,15 @@ func run() error {
 
 	ctx = internal.WithDebugFlag(ctx, settings.Debug)
 
-	if len(flag.Args()) == 0 {
+	if len(CmdRoot.FlagSet.Args()) == 0 {
 		CmdRoot.FlagSet.Usage()
 		return fmt.Errorf("no command provided")
 	}
 
-	subcmdArgs := CmdRoot.FlagSet.Args()[1:]
+	subcmdArgs := CmdRoot.FlagSet.Args()[2:]
 
-	switch cmd := CmdRoot.FlagSet.Arg(0); cmd {
+	fmt.Println("DEBUG: ", CmdRoot.FlagSet.Arg(1))
+	switch cmd := CmdRoot.FlagSet.Arg(1); cmd {
 	case "atc":
 		return ATC(ctx, GetAtcParams(settings, subcmdArgs))
 	case "takeoff", "up", "apply":
