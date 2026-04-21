@@ -12,97 +12,103 @@ import (
 	"github.com/yokecd/yoke/pkg/yoke"
 )
 
+func init() {
+	CmdSchematics.AddCommand(CmdSchematicsGet)
+	CmdSchematics.AddCommand(CmdSchematicsLs)
+	CmdSchematics.AddCommand(CmdSchematicsSet)
+}
+
 //go:embed cmd_schematics_help.txt
 var schematicsHelp string
 
-var schematicsWasmPath string
-var CmdSchematics = &YokeCommand{
-	Name:    "schematics",
-	Aliases: []string{"meta"},
-	FlagSet: flag.NewFlagSet("schematics", flag.ExitOnError),
-}
-
-func init() {
-	schematicsHelp = strings.TrimSpace(internal.Colorize(schematicsHelp))
-	CmdSchematics.FlagSet.StringVar(&schematicsWasmPath, "wasm", "", "path to wasm file. http(s), and oci urls are supported")
-
-	CmdSchematics.FlagSet.Usage = func() {
-		fmt.Fprintln(CmdSchematics.FlagSet.Output(), schematicsHelp)
-		CmdSchematics.FlagSet.PrintDefaults()
+var CmdSchematics = NewCommand("schematics", []string{"meta"}, func(ctx context.Context) (*flag.FlagSet, CmdRunner) {
+	flagset := flag.NewFlagSet("schematics", flag.ExitOnError)
+	var wasmPath string
+	flagset.StringVar(&wasmPath, "wasm", "", "path to wasm file. http(s), and oci urls are supported")
+	flagset.Usage = func() {
+		schematicsHelp = strings.TrimSpace(internal.Colorize(schematicsHelp))
+		fmt.Fprintln(flagset.Output(), schematicsHelp)
+		flagset.PrintDefaults()
 	}
-	CmdRoot.AddCommand(CmdSchematics)
-}
 
-func SchematicsCommand(ctx context.Context, args []string) error {
-	flagset := CmdSchematics.FlagSet
+	return flagset, func(ctx context.Context, settings GlobalSettings, args []string) error {
+		flagset.Parse(args)
+		return fmt.Errorf("subcommand is required")
+	}
+})
 
-	flagset.Parse(args)
-
-	if schematicsWasmPath == "" {
+var CmdSchematicsLs = NewCommand("ls", []string{}, func(ctx context.Context) (*flag.FlagSet, CmdRunner) {
+	flagset := flag.NewFlagSet("schematics ls", flag.ExitOnError)
+	var wasmPath string
+	flagset.StringVar(&wasmPath, "wasm", "", "path to wasm file. http(s), and oci urls are supported")
+	flagset.Usage = func() {
 		flagset.Usage()
-		return fmt.Errorf("--wasm is required")
+		flagset.PrintDefaults()
 	}
+	return flagset, func(ctx context.Context, settings GlobalSettings, args []string) error {
+		flagset.Parse(args)
+		schematics, err := yoke.ListSchematics(ctx, yoke.ListSchematicsParams{WasmURL: wasmPath})
+		if err != nil {
+			return fmt.Errorf("failed to list schematics: %w", err)
+		}
+		for _, schematic := range schematics {
+			fmt.Fprintln(internal.Stdout(ctx), schematic)
+		}
+		return nil
+	}
+})
 
-	if len(flagset.Args()) == 0 {
+var CmdSchematicsGet = NewCommand("get", []string{}, func(ctx context.Context) (*flag.FlagSet, CmdRunner) {
+	flagset := flag.NewFlagSet("schematics get", flag.ExitOnError)
+
+	var wasmPath string
+	flagset.StringVar(&wasmPath, "wasm", "", "path to wasm file. http(s), and oci urls are supported")
+	flagset.Usage = func() {
 		flagset.Usage()
-		return fmt.Errorf("no subcommand given to schematics")
+		flagset.PrintDefaults()
 	}
 
-	subcmd, subargs := flagset.Arg(0), flagset.Args()[1:]
+	return flagset, func(ctx context.Context, settings GlobalSettings, args []string) error {
 
-	// TODO: handle the schematics subcommand as a YokeCommand
-	switch subcmd {
-	case "ls":
-		{
-			schematics, err := yoke.ListSchematics(ctx, yoke.ListSchematicsParams{WasmURL: schematicsWasmPath})
-			if err != nil {
-				return fmt.Errorf("failed to list schematics: %w", err)
-			}
-			for _, schematic := range schematics {
-				fmt.Fprintln(internal.Stdout(ctx), schematic)
-			}
-			return nil
+		flagset.Parse(args)
+		name := flagset.Arg(0)
+		if name == "" {
+			return fmt.Errorf("name of schematics property is required")
 		}
-	case "get":
-		{
-			if len(subargs) == 0 || subargs[0] == "" {
-				return fmt.Errorf("name of schematics property is required")
-			}
-			data, err := yoke.GetSchematic(ctx, yoke.GetSchematicParams{
-				WasmURL: schematicsWasmPath,
-				Name:    subargs[0],
-			})
-			if err != nil {
-				return fmt.Errorf("failed to get schematics: %w", err)
-			}
-			_, err = internal.Stdout(ctx).Write(data)
-			return err
+		data, err := yoke.GetSchematic(ctx, yoke.GetSchematicParams{
+			WasmURL: wasmPath,
+			Name:    name,
+		})
+		if err != nil {
+			return fmt.Errorf("failed to get schematics: %w", err)
 		}
-	case "set":
-		{
-			setcmdFlagset := flag.NewFlagSet("schematics set", flag.ExitOnError)
-			cmd := setcmdFlagset.Bool("cmd", false, "marks the input as command args to be executed to generate the schematic data")
-
-			setcmdFlagset.Usage = func() {
-				flagset.Usage()
-				setcmdFlagset.PrintDefaults()
-			}
-
-			_ = setcmdFlagset.Parse(subargs)
-
-			name := setcmdFlagset.Arg(0)
-			if name == "" {
-				return fmt.Errorf("name of schematics property is required")
-			}
-
-			return yoke.SetSchematic(ctx, yoke.SetSchematicParams{
-				WasmPath: schematicsWasmPath,
-				Name:     name,
-				Input:    os.Stdin,
-				CMD:      *cmd,
-			})
-		}
-	default:
-		return fmt.Errorf("unknown schematics subcommand: %q", subcmd)
+		_, err = internal.Stdout(ctx).Write(data)
+		return err
 	}
-}
+})
+
+var CmdSchematicsSet = NewCommand("set", []string{}, func(ctx context.Context) (*flag.FlagSet, CmdRunner) {
+	flagset := flag.NewFlagSet("schematics set", flag.ExitOnError)
+	cmd := flagset.Bool("cmd", false, "marks the input as command args to be executed to generate the schematic data")
+
+	var wasmPath string
+	flagset.StringVar(&wasmPath, "wasm", "", "path to wasm file. http(s), and oci urls are supported")
+	flagset.Usage = func() {
+		flagset.Usage()
+		flagset.PrintDefaults()
+	}
+
+	return flagset, func(ctx context.Context, settings GlobalSettings, args []string) error {
+		_ = flagset.Parse(args)
+		name := flagset.Arg(0)
+		if name == "" {
+			return fmt.Errorf("name of schematics property is required")
+		}
+		return yoke.SetSchematic(ctx, yoke.SetSchematicParams{
+			WasmPath: wasmPath,
+			Name:     name,
+			Input:    os.Stdin,
+			CMD:      *cmd,
+		})
+	}
+})

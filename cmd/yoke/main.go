@@ -35,10 +35,20 @@ func main() {
 //go:embed cmd_help.txt
 var rootHelp string
 
-var CmdRoot = &YokeCommand{
-	Name:    "yoke",
-	FlagSet: flag.NewFlagSet("yoke", flag.ExitOnError),
-}
+var CmdRoot = NewCommand("yoke", []string{}, func(ctx context.Context) (*flag.FlagSet, CmdRunner) {
+	flagset := flag.NewFlagSet("yoke", flag.ExitOnError)
+	flagset.Usage = func() {
+		rootHelp = strings.TrimSpace(internal.Colorize(rootHelp))
+		fmt.Fprintln(flag.CommandLine.Output(), rootHelp)
+		flagset.PrintDefaults()
+		fmt.Fprintln(os.Stderr)
+	}
+	runner := func(ctx context.Context, settings GlobalSettings, args []string) error {
+		RegisterGlobalFlags(flagset, &settings)
+		return nil
+	}
+	return flagset, runner
+})
 
 var settings = GlobalSettings{
 	Debug: new(bool),
@@ -46,13 +56,11 @@ var settings = GlobalSettings{
 }
 
 func init() {
-	rootHelp = strings.TrimSpace(internal.Colorize(rootHelp))
-	RegisterGlobalFlags(CmdRoot.FlagSet, &settings)
-	CmdRoot.FlagSet.Usage = func() {
-		fmt.Fprintln(flag.CommandLine.Output(), rootHelp)
-		CmdRoot.FlagSet.PrintDefaults()
-		fmt.Fprintln(os.Stderr)
-	}
+	CmdRoot.AddCommand(CmdATC)
+	CmdRoot.AddCommand(CmdBlackbox)
+	CmdRoot.AddCommand(CmdDescent)
+	CmdRoot.AddCommand(CmdMayday)
+	CmdRoot.AddCommand(CmdSchematics)
 }
 
 func run() error {
@@ -76,10 +84,25 @@ func run() error {
 
 	subcmdArgs := CmdRoot.FlagSet.Args()[2:]
 
-	fmt.Println("DEBUG: ", CmdRoot.FlagSet.Arg(1))
 	switch cmd := CmdRoot.FlagSet.Arg(1); cmd {
 	case "atc":
-		return ATC(ctx, GetAtcParams(settings, subcmdArgs))
+		return CmdATC.Runner(ctx, settings, subcmdArgs)
+	case "blackbox", "inspect":
+		return CmdBlackbox.Runner(ctx, settings, subcmdArgs)
+	case "descent", "down", "restore":
+		return CmdDescent.Runner(ctx, settings, subcmdArgs)
+	case "mayday", "delete":
+		return CmdMayday.Runner(ctx, settings, subcmdArgs)
+	case "schematics", "meta":
+		{
+			if len(subcmdArgs) > 0 {
+				sub, ok := CmdSchematics.SubCommands[subcmdArgs[len(subcmdArgs)-1]]
+				if ok {
+					return sub.Runner(ctx, settings, subcmdArgs)
+				}
+			}
+			return CmdSchematics.Runner(ctx, settings, subcmdArgs)
+		}
 	case "takeoff", "up", "apply":
 		{
 			var source io.Reader
@@ -91,30 +114,6 @@ func run() error {
 				return err
 			}
 			return TakeOff(ctx, *params)
-		}
-	case "descent", "down", "restore":
-		{
-			params, err := GetDescentfParams(settings, subcmdArgs)
-			if err != nil {
-				return err
-			}
-			return Descent(ctx, *params)
-		}
-	case "mayday", "delete":
-		{
-			params, err := GetMaydayParams(settings, subcmdArgs)
-			if err != nil {
-				return err
-			}
-			return Mayday(ctx, *params)
-		}
-	case "blackbox", "inspect":
-		{
-			params, err := GetBlackBoxParams(settings, subcmdArgs)
-			if err != nil {
-				return err
-			}
-			return Blackbox(ctx, *params)
 		}
 	case "turbulence", "drift", "diff":
 		{
@@ -139,10 +138,6 @@ func run() error {
 				return err
 			}
 			return Unlatch(ctx, *params)
-		}
-	case "schematics", "meta":
-		{
-			return SchematicsCommand(ctx, subcmdArgs)
 		}
 
 	case "sign":
