@@ -6,12 +6,9 @@ import (
 	_ "embed"
 	"flag"
 	"fmt"
-	"io"
 	"os"
 	"strings"
 	"syscall"
-
-	"golang.org/x/term"
 
 	"github.com/davidmdm/x/xcontext"
 
@@ -64,6 +61,8 @@ func init() {
 	CmdRoot.AddCommand(CmdSign)
 	CmdRoot.AddCommand(CmdStow)
 	CmdRoot.AddCommand(CmdTakeoff)
+	CmdRoot.AddCommand(CmdVersion)
+	CmdRoot.AddCommand(CmdTurbulence)
 }
 
 func run() error {
@@ -110,25 +109,9 @@ func run() error {
 	case "stow", "push":
 		return CmdStow.Runner(ctx, settings, subcmdArgs)
 	case "takeoff", "up", "apply":
-		{
-			var source io.Reader
-			if !term.IsTerminal(int(os.Stdin.Fd())) {
-				source = os.Stdin
-			}
-			params, err := GetTakeoffParams(settings, source, subcmdArgs)
-			if err != nil {
-				return err
-			}
-			return TakeOff(ctx, *params)
-		}
+		CmdTakeoff.Runner(ctx, settings, subcmdArgs)
 	case "turbulence", "drift", "diff":
-		{
-			params, err := GetTurbulenceParams(settings, subcmdArgs)
-			if err != nil {
-				return err
-			}
-			return Turbulence(ctx, *params)
-		}
+		CmdTurbulence.Runner(ctx, settings, subcmdArgs)
 	case "unlatch", "unlock":
 		{
 			params, err := GetUnlatchParams(settings, subcmdArgs)
@@ -146,14 +129,12 @@ func run() error {
 			}
 			return yoke.Verify(*params)
 		}
-
 	case "version":
-		{
-			return Version(ctx)
-		}
+		return CmdVersion.Runner(ctx, settings, subcmdArgs)
 	default:
 		return fmt.Errorf("unknown command: %s", cmd)
 	}
+	return nil
 }
 
 type GlobalSettings struct {

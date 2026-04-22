@@ -75,8 +75,12 @@ var CmdTakeoff = NewCommand("takeoff", []string{"up", "apply"}, func(ctx context
 	}
 
 	return flagset, func(ctx context.Context, settings GlobalSettings, args []string) error {
+		var source io.Reader
+		if !term.IsTerminal(int(os.Stdin.Fd())) {
+			source = os.Stdin
+		}
 		params.Flight = yoke.FlightParams{Input: source}
-		RegisterGlobalFlags(flagset, settings)
+		RegisterGlobalFlags(flagset, &settings)
 
 		args, params.Flight.Args = internal.CutArgs(args)
 
