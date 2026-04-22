@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"slices"
 	"strings"
 
 	"github.com/yokecd/yoke/internal"
@@ -59,7 +60,7 @@ var CmdSchematicsLs = NewCommand("ls", []string{}, func(ctx context.Context) (*f
 })
 
 var CmdSchematicsGet = NewCommand("get", []string{}, func(ctx context.Context) (*flag.FlagSet, CmdRunner) {
-	flagset := flag.NewFlagSet("schematics get", flag.ExitOnError)
+	flagset := flag.NewFlagSet("get", flag.ExitOnError)
 
 	var wasmPath string
 	flagset.StringVar(&wasmPath, "wasm", "", "path to wasm file. http(s), and oci urls are supported")
@@ -71,7 +72,11 @@ var CmdSchematicsGet = NewCommand("get", []string{}, func(ctx context.Context) (
 	return flagset, func(ctx context.Context, settings GlobalSettings, args []string) error {
 
 		flagset.Parse(args)
-		name := flagset.Arg(0)
+		idxGet := slices.Index(flagset.Args(), "get")
+		name := ""
+		if idxGet >= 0 {
+			name = flagset.Arg(idxGet + 1)
+		}
 		if name == "" {
 			return fmt.Errorf("name of schematics property is required")
 		}
@@ -88,7 +93,7 @@ var CmdSchematicsGet = NewCommand("get", []string{}, func(ctx context.Context) (
 })
 
 var CmdSchematicsSet = NewCommand("set", []string{}, func(ctx context.Context) (*flag.FlagSet, CmdRunner) {
-	flagset := flag.NewFlagSet("schematics set", flag.ExitOnError)
+	flagset := flag.NewFlagSet("set", flag.ExitOnError)
 	cmd := flagset.Bool("cmd", false, "marks the input as command args to be executed to generate the schematic data")
 
 	var wasmPath string
@@ -100,7 +105,11 @@ var CmdSchematicsSet = NewCommand("set", []string{}, func(ctx context.Context) (
 
 	return flagset, func(ctx context.Context, settings GlobalSettings, args []string) error {
 		_ = flagset.Parse(args)
-		name := flagset.Arg(0)
+		idxGet := slices.Index(flagset.Args(), "set")
+		name := ""
+		if idxGet >= 0 {
+			name = flagset.Arg(idxGet + 1)
+		}
 		if name == "" {
 			return fmt.Errorf("name of schematics property is required")
 		}

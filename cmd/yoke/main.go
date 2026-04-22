@@ -95,14 +95,15 @@ func run() error {
 		return CmdMayday.Runner(ctx, settings, subcmdArgs)
 	case "schematics", "meta":
 		{
-			if len(subcmdArgs) > 0 {
-				sub, ok := CmdSchematics.SubCommands[subcmdArgs[len(subcmdArgs)-1]]
-				if ok {
-					return sub.Runner(ctx, settings, subcmdArgs)
-				}
-			}
-			return CmdSchematics.Runner(ctx, settings, subcmdArgs)
+			runner := Seek(CmdRoot.FlagSet.Args())
+			// FIXME: doesn't work if we just pass in args
+			// it seems to be because subcmdArgs  passes the flag first,
+			// which works... maybe we could handle that in seek somehow
+			return runner(ctx, settings, subcmdArgs)
+			// It might also make more sense for wasmfile to be positional
 		}
+	case "sign":
+		return CmdSign.Runner(ctx, settings, subcmdArgs)
 	case "takeoff", "up", "apply":
 		{
 			var source io.Reader
@@ -140,14 +141,6 @@ func run() error {
 			return Unlatch(ctx, *params)
 		}
 
-	case "sign":
-		{
-			params, err := GetSignParams(subcmdArgs)
-			if err != nil {
-				return err
-			}
-			return yoke.Sign(*params)
-		}
 	case "verify":
 		{
 			params, err := GetVerifyParams(subcmdArgs)

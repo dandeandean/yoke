@@ -51,6 +51,8 @@ func NewCommand(name string, aliases []string, builder CmdBuilder) *YokeCommand 
 	}
 }
 
+// TODO: need to also return the args or index
+// that we need to slice into them to run the sub commands properly
 func Seek(args []string) CmdRunner {
 	cmdPtr := CmdRoot
 	for _, arg := range args {
