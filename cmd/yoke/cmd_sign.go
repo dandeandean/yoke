@@ -40,7 +40,3 @@ var CmdSign = NewCommand("sign", []string{}, func(ctx context.Context) (*flag.Fl
 		return yoke.Sign(params)
 	}
 })
-
-func init() {
-	CmdRoot.AddCommand(CmdSign)
-}

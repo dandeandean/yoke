@@ -61,6 +61,9 @@ func init() {
 	CmdRoot.AddCommand(CmdDescent)
 	CmdRoot.AddCommand(CmdMayday)
 	CmdRoot.AddCommand(CmdSchematics)
+	CmdRoot.AddCommand(CmdSign)
+	CmdRoot.AddCommand(CmdStow)
+	CmdRoot.AddCommand(CmdTakeoff)
 }
 
 func run() error {
@@ -104,6 +107,8 @@ func run() error {
 		}
 	case "sign":
 		return CmdSign.Runner(ctx, settings, subcmdArgs)
+	case "stow", "push":
+		return CmdStow.Runner(ctx, settings, subcmdArgs)
 	case "takeoff", "up", "apply":
 		{
 			var source io.Reader
@@ -123,14 +128,6 @@ func run() error {
 				return err
 			}
 			return Turbulence(ctx, *params)
-		}
-	case "stow", "push":
-		{
-			params, err := GetStowParams(subcmdArgs)
-			if err != nil {
-				return err
-			}
-			return yoke.Stow(ctx, *params)
 		}
 	case "unlatch", "unlock":
 		{
