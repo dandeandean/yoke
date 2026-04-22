@@ -61,8 +61,8 @@ func init() {
 	CmdRoot.AddCommand(CmdSign)
 	CmdRoot.AddCommand(CmdStow)
 	CmdRoot.AddCommand(CmdTakeoff)
-	CmdRoot.AddCommand(CmdVersion)
 	CmdRoot.AddCommand(CmdTurbulence)
+	CmdRoot.AddCommand(CmdVersion)
 }
 
 func run() error {
