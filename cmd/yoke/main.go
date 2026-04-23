@@ -63,6 +63,8 @@ func init() {
 	CmdRoot.AddCommand(CmdTakeoff)
 	CmdRoot.AddCommand(CmdTurbulence)
 	CmdRoot.AddCommand(CmdVersion)
+	CmdRoot.AddCommand(CmdUnlatch)
+	CmdRoot.AddCommand(CmdVerify)
 }
 
 func run() error {
@@ -113,14 +115,7 @@ func run() error {
 	case "turbulence", "drift", "diff":
 		CmdTurbulence.Runner(ctx, settings, subcmdArgs)
 	case "unlatch", "unlock":
-		{
-			params, err := GetUnlatchParams(settings, subcmdArgs)
-			if err != nil {
-				return err
-			}
-			return Unlatch(ctx, *params)
-		}
-
+		return CmdUnlatch.Runner(ctx, settings, subcmdArgs)
 	case "verify":
 		{
 			params, err := GetVerifyParams(subcmdArgs)
