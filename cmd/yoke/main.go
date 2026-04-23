@@ -16,7 +16,6 @@ import (
 
 	"github.com/yokecd/yoke/internal"
 	"github.com/yokecd/yoke/internal/home"
-	"github.com/yokecd/yoke/pkg/yoke"
 )
 
 func main() {
@@ -117,13 +116,7 @@ func run() error {
 	case "unlatch", "unlock":
 		return CmdUnlatch.Runner(ctx, settings, subcmdArgs)
 	case "verify":
-		{
-			params, err := GetVerifyParams(subcmdArgs)
-			if err != nil {
-				return err
-			}
-			return yoke.Verify(*params)
-		}
+		return CmdVerify.Runner(ctx, settings, subcmdArgs)
 	case "version":
 		return CmdVersion.Runner(ctx, settings, subcmdArgs)
 	default:
