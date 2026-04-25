@@ -80,11 +80,12 @@ func run() error {
 
 	ctx = internal.WithDebugFlag(ctx, settings.Debug)
 
-	if len(CmdRoot.FlagSet.Args()) == 0 {
+	if len(CmdRoot.FlagSet.Args()) == 1 {
 		CmdRoot.FlagSet.Usage()
 		return fmt.Errorf("no command provided")
 	}
 
+	fmt.Println("DEBUG:", CmdRoot.Name, CmdRoot.FlagSet.Args())
 	subcmdArgs := CmdRoot.FlagSet.Args()[2:]
 
 	switch cmd := CmdRoot.FlagSet.Arg(1); cmd {
@@ -98,7 +99,7 @@ func run() error {
 		return CmdMayday.Runner(ctx, settings, subcmdArgs)
 	case "schematics", "meta":
 		{
-			runner := Seek(CmdRoot.FlagSet.Args())
+			runner, _ := Seek(CmdRoot.FlagSet.Args())
 			// FIXME: doesn't work if we just pass in args
 			// it seems to be because subcmdArgs  passes the flag first,
 			// which works... maybe we could handle that in seek somehow

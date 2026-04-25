@@ -80,6 +80,7 @@ var CmdTakeoff = NewCommand("takeoff", []string{"up", "apply"}, func(ctx context
 			source = os.Stdin
 		}
 		params.Flight = yoke.FlightParams{Input: source}
+		params.Kube = settings.Kube
 		RegisterGlobalFlags(flagset, &settings)
 
 		args, params.Flight.Args = internal.CutArgs(args)
@@ -106,6 +107,7 @@ var CmdTakeoff = NewCommand("takeoff", []string{"up", "apply"}, func(ctx context
 })
 
 func TakeOff(ctx context.Context, params TakeoffParams) error {
+	fmt.Println("DEBUG", params.Kube)
 	commander, err := yoke.FromKubeConfigFlags(params.Kube)
 	if err != nil {
 		return err

@@ -38,7 +38,6 @@ var CmdMayday = NewCommand("mayday", []string{"delete"}, func(ctx context.Contex
 		params.GlobalSettings = settings
 		RegisterGlobalFlags(flagset, &params.GlobalSettings)
 
-		RegisterGlobalFlags(flagset, &params.GlobalSettings)
 		flagset.Parse(args)
 		if removeAll {
 			params.RemoveCRDs = true
