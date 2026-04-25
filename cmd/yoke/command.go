@@ -24,6 +24,15 @@ type YokeCommand struct {
 // AddCommand registers sub into the parents SubCommands
 func (y *YokeCommand) AddCommand(sub *YokeCommand) {
 	sub.Parent = y
+	/*
+		// register parents flags
+		// this might not be the way we want to go
+			if y.FlagSet != nil && sub.FlagSet != nil {
+				y.FlagSet.VisitAll(func(f *flag.Flag) {
+					sub.FlagSet.Var(f.Value, f.Name, f.Usage)
+				})
+			}
+	*/
 	y.SubCommands[sub.Name] = sub
 	for _, alias := range sub.Aliases {
 		_, alreadyThere := y.SubCommands[alias]

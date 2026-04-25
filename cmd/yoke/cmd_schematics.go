@@ -46,7 +46,18 @@ var CmdSchematicsLs = NewCommand("ls", []string{}, func(ctx context.Context) (*f
 		flagset.Usage()
 		flagset.PrintDefaults()
 	}
-	return flagset, func(ctx context.Context, settings GlobalSettings, args []string) error {
+	return flagset, func(ctx context.Context, settings GlobalSettings, _ []string) error {
+		// FIXME:
+		// This is so incredibily janky, but I can't think of another way to do this
+		args := os.Args
+		idxBase := slices.Index(args, "schematics")
+		if idxBase >= 0 {
+			args = os.Args[idxBase+1:]
+			fmt.Println("DEBUG: ls", args)
+		} else {
+			return fmt.Errorf("orphaned subcommand")
+		}
+
 		flagset.Parse(args)
 		schematics, err := yoke.ListSchematics(ctx, yoke.ListSchematicsParams{WasmURL: wasmPath})
 		if err != nil {
@@ -69,8 +80,16 @@ var CmdSchematicsGet = NewCommand("get", []string{}, func(ctx context.Context) (
 		flagset.PrintDefaults()
 	}
 
-	return flagset, func(ctx context.Context, settings GlobalSettings, args []string) error {
-
+	return flagset, func(ctx context.Context, settings GlobalSettings, _ []string) error {
+		//FIXME
+		args := os.Args
+		idxBase := slices.Index(args, "schematics")
+		if idxBase >= 0 {
+			args = os.Args[idxBase+1:]
+			fmt.Println("DEBUG: get", args)
+		} else {
+			return fmt.Errorf("orphaned subcommand")
+		}
 		flagset.Parse(args)
 		idxGet := slices.Index(flagset.Args(), "get")
 		name := ""
@@ -103,7 +122,17 @@ var CmdSchematicsSet = NewCommand("set", []string{}, func(ctx context.Context) (
 		flagset.PrintDefaults()
 	}
 
-	return flagset, func(ctx context.Context, settings GlobalSettings, args []string) error {
+	return flagset, func(ctx context.Context, settings GlobalSettings, _ []string) error {
+		//FIXME
+		args := os.Args
+		idxBase := slices.Index(args, "schematics")
+		if idxBase >= 0 {
+			args = os.Args[idxBase+1:]
+			fmt.Println("DEBUG: set", args)
+		} else {
+			return fmt.Errorf("orphaned subcommand")
+		}
+
 		_ = flagset.Parse(args)
 		idxGet := slices.Index(flagset.Args(), "set")
 		name := ""
