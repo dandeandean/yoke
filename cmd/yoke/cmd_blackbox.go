@@ -64,7 +64,6 @@ var CmdBlackbox = NewCommand("blackbox", []string{"inspect"}, func(ctx context.C
 		}
 		return Blackbox(ctx, params)
 	}
-
 })
 
 func Blackbox(ctx context.Context, params BlackboxParams) error {

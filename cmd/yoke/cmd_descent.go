@@ -39,7 +39,7 @@ var CmdDescent = NewCommand("descent", []string{"down", "restore"}, func(ctx con
 		fmt.Fprintln(flagset.Output(), descentHelp)
 		flagset.PrintDefaults()
 	}
-	runner := func(ctx context.Context, settings GlobalSettings, args []string) error {
+	return flagset, func(ctx context.Context, settings GlobalSettings, args []string) error {
 		params.GlobalSettings = settings
 		RegisterGlobalFlags(flagset, &params.GlobalSettings)
 		flagset.Parse(args)
@@ -63,7 +63,6 @@ var CmdDescent = NewCommand("descent", []string{"down", "restore"}, func(ctx con
 		params.RevisionID = revisionID
 		return Descent(ctx, params)
 	}
-	return flagset, runner
 })
 
 func Descent(ctx context.Context, params DescentParams) error {

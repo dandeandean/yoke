@@ -33,8 +33,7 @@ var CmdMayday = NewCommand("mayday", []string{"delete"}, func(ctx context.Contex
 		fmt.Fprintln(flagset.Output(), maydayHelp)
 		flagset.PrintDefaults()
 	}
-	runner := func(ctx context.Context, settings GlobalSettings, args []string) error {
-
+	return flagset, func(ctx context.Context, settings GlobalSettings, args []string) error {
 		params.GlobalSettings = settings
 		RegisterGlobalFlags(flagset, &params.GlobalSettings)
 
@@ -49,7 +48,6 @@ var CmdMayday = NewCommand("mayday", []string{"delete"}, func(ctx context.Contex
 		}
 		return Mayday(ctx, params)
 	}
-	return flagset, runner
 })
 
 func Mayday(ctx context.Context, params MaydayParams) error {
