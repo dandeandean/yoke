@@ -7,6 +7,7 @@ import (
 
 // TestCmdSubs asserts that all of the expected sub commands are in place
 func TestCmdSubs(t *testing.T) {
+	// this is dumb
 	validCommands := []string{
 		"atc",
 		"mayday",
@@ -20,10 +21,28 @@ func TestCmdSubs(t *testing.T) {
 		"turbulence",
 		"stow",
 		"sign",
+		"inspect",
+		"push",
+		"drift",
+		"diff",
+		"delete",
+		"meta",
+		"apply",
+		"up",
+		"down",
+		"restore",
+		"unlock",
 	}
 	for _, cmd := range validCommands {
+		t.Logf("Checking SubCommand for root: %v", cmd)
 		if _, ok := CmdRoot.SubCommands[cmd]; !ok {
 			t.Fatalf("expected %s to be a subcommand of the root command", cmd)
+		}
+	}
+	for _, cmd := range []string{"ls", "set", "get"} {
+		t.Logf("Checking SubCommand for schematics %v", cmd)
+		if _, ok := CmdSchematics.SubCommands[cmd]; !ok {
+			t.Fatalf("expected %s to be a subcommand of the schematics command", cmd)
 		}
 	}
 }
