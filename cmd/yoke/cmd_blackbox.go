@@ -43,7 +43,7 @@ var CmdBlackbox = NewCommand("blackbox", []string{"inspect"}, func(ctx context.C
 		fmt.Fprintln(flagset.Output(), blackboxHelp)
 		flagset.PrintDefaults()
 	}
-	runner := func(ctx context.Context, settings GlobalSettings, args []string) error {
+	return flagset, func(ctx context.Context, settings GlobalSettings, args []string) error {
 		params.GlobalSettings = settings
 		RegisterGlobalFlags(flagset, &params.GlobalSettings)
 		flagset.Parse(args)
@@ -64,7 +64,7 @@ var CmdBlackbox = NewCommand("blackbox", []string{"inspect"}, func(ctx context.C
 		}
 		return Blackbox(ctx, params)
 	}
-	return flagset, runner
+
 })
 
 func Blackbox(ctx context.Context, params BlackboxParams) error {

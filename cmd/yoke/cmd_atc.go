@@ -29,14 +29,13 @@ var CmdATC = NewCommand("atc", []string{}, func(ctx context.Context) (*flag.Flag
 	flagset := flag.NewFlagSet("atc", flag.ExitOnError)
 	params := ATCParams{}
 	flagset.StringVar(&params.Debug, "debug-file", "", "debug file")
-	runner := func(ctx context.Context, settings GlobalSettings, args []string) error {
+	return flagset, func(ctx context.Context, settings GlobalSettings, args []string) error {
 		params.GlobalSettings = settings
 		RegisterGlobalFlags(flagset, &params.GlobalSettings)
 		flagset.Parse(args)
 		ATC(ctx, params)
 		return nil
 	}
-	return flagset, runner
 })
 
 func ATC(ctx context.Context, params ATCParams) error {
