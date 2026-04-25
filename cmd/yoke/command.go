@@ -21,7 +21,7 @@ type YokeCommand struct {
 	Runner         CmdRunner
 }
 
-// We might actually want to implement this as a map to make it blazingly fast
+// AddCommand registers sub into the parents SubCommands
 func (y *YokeCommand) AddCommand(sub *YokeCommand) {
 	sub.Parent = y
 	y.SubCommands[sub.Name] = sub
