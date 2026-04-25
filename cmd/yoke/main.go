@@ -82,7 +82,6 @@ func run() error {
 	ctx = internal.WithDebugFlag(ctx, settings.Debug)
 
 	runner, subCmdArgs := Seek(CmdRoot.FlagSet.Args())
-	fmt.Println("DEBUG:", CmdRoot.FlagSet.Args(), subCmdArgs)
 
 	return runner(ctx, settings, subCmdArgs)
 }

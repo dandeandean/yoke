@@ -53,7 +53,6 @@ var CmdSchematicsLs = NewCommand("ls", []string{}, func(ctx context.Context) (*f
 		idxBase := slices.Index(args, "schematics")
 		if idxBase >= 0 {
 			args = os.Args[idxBase+1:]
-			fmt.Println("DEBUG: ls", args)
 		} else {
 			return fmt.Errorf("orphaned subcommand")
 		}
@@ -86,7 +85,6 @@ var CmdSchematicsGet = NewCommand("get", []string{}, func(ctx context.Context) (
 		idxBase := slices.Index(args, "schematics")
 		if idxBase >= 0 {
 			args = os.Args[idxBase+1:]
-			fmt.Println("DEBUG: get", args)
 		} else {
 			return fmt.Errorf("orphaned subcommand")
 		}
@@ -128,7 +126,6 @@ var CmdSchematicsSet = NewCommand("set", []string{}, func(ctx context.Context) (
 		idxBase := slices.Index(args, "schematics")
 		if idxBase >= 0 {
 			args = os.Args[idxBase+1:]
-			fmt.Println("DEBUG: set", args)
 		} else {
 			return fmt.Errorf("orphaned subcommand")
 		}

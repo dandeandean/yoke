@@ -107,7 +107,6 @@ var CmdTakeoff = NewCommand("takeoff", []string{"up", "apply"}, func(ctx context
 })
 
 func TakeOff(ctx context.Context, params TakeoffParams) error {
-	fmt.Println("DEBUG", params.Kube)
 	commander, err := yoke.FromKubeConfigFlags(params.Kube)
 	if err != nil {
 		return err
