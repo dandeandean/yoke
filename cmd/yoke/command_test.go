@@ -5,7 +5,8 @@ import (
 	"testing"
 )
 
-func TestCmdRoot(t *testing.T) {
+// TestCmdSubs asserts that all of the expected sub commands are in place
+func TestCmdSubs(t *testing.T) {
 	validCommands := []string{
 		"atc",
 		"mayday",
@@ -27,17 +28,28 @@ func TestCmdRoot(t *testing.T) {
 	}
 }
 
-func TestCmdSeek(t *testing.T) {
-	for _, s := range []struct {
+// TestCmdSeekRunner tests that the Seek function can find the correct
+// sub command runner given a slice of args
+func TestCmdSeekRunner(t *testing.T) {
+	type tMatrix struct {
 		Want CmdRunner
 		Args []string
-	}{
-		{
-			Want: CmdRoot.Runner,
-			Args: []string{"yoke"},
-		},
-	} {
+	}
+	tests := []tMatrix{
+		{Want: CmdRoot.Runner, Args: []string{"yoke"}},
+		{Want: CmdSchematicsGet.Runner, Args: []string{"yoke", "schematics", "get"}},
+		{Want: CmdSchematicsLs.Runner, Args: []string{"yoke", "schematics", "ls"}},
+		{Want: CmdSchematicsSet.Runner, Args: []string{"yoke", "schematics", "set"}},
+	}
+	for k, c := range CmdRoot.SubCommands {
+		tests = append(tests, tMatrix{
+			Want: c.Runner,
+			Args: []string{"yoke", k},
+		})
+	}
+	for _, s := range tests {
 		runner, _ := Seek(s.Args)
+		t.Logf("Checking runner for %v", s.Args)
 		if reflect.ValueOf(runner) != reflect.ValueOf(s.Want) {
 			t.Fatalf("got function mismatch for %v", s.Args)
 		}
