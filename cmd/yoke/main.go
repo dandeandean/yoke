@@ -41,7 +41,8 @@ var CmdRoot = NewCommand("yoke", []string{}, func(ctx context.Context) (*flag.Fl
 	}
 	runner := func(ctx context.Context, settings GlobalSettings, args []string) error {
 		RegisterGlobalFlags(flagset, &settings)
-		return nil
+		flagset.Usage()
+		return fmt.Errorf("no command provided")
 	}
 	return flagset, runner
 })
@@ -80,50 +81,10 @@ func run() error {
 
 	ctx = internal.WithDebugFlag(ctx, settings.Debug)
 
-	if len(CmdRoot.FlagSet.Args()) == 1 {
-		CmdRoot.FlagSet.Usage()
-		return fmt.Errorf("no command provided")
-	}
+	runner, subCmdArgs := Seek(CmdRoot.FlagSet.Args())
+	fmt.Println("DEBUG:", CmdRoot.FlagSet.Args(), subCmdArgs)
 
-	fmt.Println("DEBUG:", CmdRoot.Name, CmdRoot.FlagSet.Args())
-	subcmdArgs := CmdRoot.FlagSet.Args()[2:]
-
-	switch cmd := CmdRoot.FlagSet.Arg(1); cmd {
-	case "atc":
-		return CmdATC.Runner(ctx, settings, subcmdArgs)
-	case "blackbox", "inspect":
-		return CmdBlackbox.Runner(ctx, settings, subcmdArgs)
-	case "descent", "down", "restore":
-		return CmdDescent.Runner(ctx, settings, subcmdArgs)
-	case "mayday", "delete":
-		return CmdMayday.Runner(ctx, settings, subcmdArgs)
-	case "schematics", "meta":
-		{
-			runner, _ := Seek(CmdRoot.FlagSet.Args())
-			// FIXME: doesn't work if we just pass in args
-			// it seems to be because subcmdArgs  passes the flag first,
-			// which works... maybe we could handle that in seek somehow
-			return runner(ctx, settings, subcmdArgs)
-			// It might also make more sense for wasmfile to be positional
-		}
-	case "sign":
-		return CmdSign.Runner(ctx, settings, subcmdArgs)
-	case "stow", "push":
-		return CmdStow.Runner(ctx, settings, subcmdArgs)
-	case "takeoff", "up", "apply":
-		CmdTakeoff.Runner(ctx, settings, subcmdArgs)
-	case "turbulence", "drift", "diff":
-		CmdTurbulence.Runner(ctx, settings, subcmdArgs)
-	case "unlatch", "unlock":
-		return CmdUnlatch.Runner(ctx, settings, subcmdArgs)
-	case "verify":
-		return CmdVerify.Runner(ctx, settings, subcmdArgs)
-	case "version":
-		return CmdVersion.Runner(ctx, settings, subcmdArgs)
-	default:
-		return fmt.Errorf("unknown command: %s", cmd)
-	}
-	return nil
+	return runner(ctx, settings, subCmdArgs)
 }
 
 type GlobalSettings struct {

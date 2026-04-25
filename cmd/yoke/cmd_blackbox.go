@@ -32,7 +32,7 @@ type BlackboxParams struct {
 //go:embed cmd_blackbox_help.txt
 var blackboxHelp string
 
-var CmdBlackbox = NewCommand("blackbox", []string{"inpsect"}, func(ctx context.Context) (*flag.FlagSet, CmdRunner) {
+var CmdBlackbox = NewCommand("blackbox", []string{"inspect"}, func(ctx context.Context) (*flag.FlagSet, CmdRunner) {
 	params := BlackboxParams{}
 	flagset := flag.NewFlagSet("blackbox", flag.ExitOnError)
 

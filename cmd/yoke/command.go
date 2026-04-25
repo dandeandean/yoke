@@ -53,11 +53,17 @@ func NewCommand(name string, aliases []string, builder CmdBuilder) *YokeCommand 
 
 func Seek(args []string) (CmdRunner, []string) {
 	cmdPtr := CmdRoot
-	for _, arg := range args {
+	var argsOut []string
+	for i, arg := range args {
 		nextCmd, ok := cmdPtr.SubCommands[arg]
 		if ok {
 			cmdPtr = nextCmd
+			if i+1 < len(args) {
+				argsOut = args[i+1:]
+			} else {
+				argsOut = []string{}
+			}
 		}
 	}
-	return cmdPtr.Runner, []string{}
+	return cmdPtr.Runner, argsOut
 }
