@@ -81,9 +81,13 @@ func run() error {
 
 	ctx = internal.WithDebugFlag(ctx, settings.Debug)
 
-	runner, subCmdArgs := Seek(CmdRoot.FlagSet.Args())
+	cmd, subCmdArgs := Seek(CmdRoot.FlagSet.Args())
 
-	return runner(ctx, settings, subCmdArgs)
+	if cmd == nil || cmd.Runner == nil {
+		return fmt.Errorf("unknown command")
+	}
+
+	return cmd.Runner(ctx, settings, subCmdArgs)
 }
 
 type GlobalSettings struct {

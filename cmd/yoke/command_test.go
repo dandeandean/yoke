@@ -67,9 +67,9 @@ func TestCmdSeekRunner(t *testing.T) {
 		})
 	}
 	for _, s := range tests {
-		runner, _ := Seek(s.Args)
+		cmd, _ := Seek(s.Args)
 		t.Logf("Checking runner for %v", s.Args)
-		if reflect.ValueOf(runner) != reflect.ValueOf(s.Want) {
+		if reflect.ValueOf(cmd.Runner) != reflect.ValueOf(s.Want) {
 			t.Fatalf("got function mismatch for %v", s.Args)
 		}
 	}

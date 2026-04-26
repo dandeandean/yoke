@@ -60,7 +60,7 @@ func NewCommand(name string, aliases []string, builder CmdBuilder) *YokeCommand 
 	}
 }
 
-func Seek(args []string) (CmdRunner, []string) {
+func Seek(args []string) (*YokeCommand, []string) {
 	cmdPtr := CmdRoot
 	var argsOut []string
 	for i, arg := range args {
@@ -74,5 +74,5 @@ func Seek(args []string) (CmdRunner, []string) {
 			}
 		}
 	}
-	return cmdPtr.Runner, argsOut
+	return cmdPtr, argsOut
 }

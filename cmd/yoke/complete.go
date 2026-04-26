@@ -58,19 +58,14 @@ func getCommandCompletions(args []string) []*YokeCommand {
 	if partial == "complete" || partial == "yoke" {
 		partial = ""
 	}
-	// We've already completed the command
-	cmd, ok := CmdRoot.SubCommands[partial]
-	if ok {
-		for _, c := range cmd.SubCommands {
-			fmt.Println("\t sub:", c.Name, partial, partial)
-			if strings.HasPrefix(c.Name, partial) || partial == "" {
-				out = append(out, c)
-			}
-		}
-		return out
+
+	cmd, rest := Seek(args)
+	// we've hit the end, set the partial to ""
+	if len(rest) == 0 {
+		partial = ""
 	}
-	for k, v := range CmdRoot.SubCommands {
-		if strings.HasPrefix(k, partial) {
+	for k, v := range cmd.SubCommands {
+		if strings.HasPrefix(k, partial) || partial == "" {
 			out = append(out, v)
 		}
 	}
