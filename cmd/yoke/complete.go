@@ -27,7 +27,7 @@ func getFlagCompletion(args []string, cmd *YokeCommand) []string {
 	if cmd.FlagSet == nil {
 		return out
 	}
-	filterForPrefix := func(f *flag.Flag, p string) {
+	appendWithPrefix := func(f *flag.Flag, p string) {
 		if p == "" || strings.HasPrefix(f.Name, p) {
 			if !slices.Contains(args, f.Name) {
 				flagSetAll["-"+f.Name] = true
@@ -35,16 +35,14 @@ func getFlagCompletion(args []string, cmd *YokeCommand) []string {
 		}
 	}
 	// Iterate through all of the places we get flags from
-	// If we had more layers, we'd need to not just
-	// FIXME: Actually traverse the tree upward
-	// needs to be upward so that we don't print the wrong flags
-	flag.VisitAll(func(f *flag.Flag) {
-		filterForPrefix(f, partial)
-	})
-	// get flagset flag
-	cmd.FlagSet.VisitAll(func(f *flag.Flag) {
-		filterForPrefix(f, partial)
-	})
+	cur := cmd
+	for cur != nil && cur.FlagSet != nil {
+		cur.FlagSet.VisitAll(func(f *flag.Flag) {
+			appendWithPrefix(f, partial)
+		})
+		cur = cur.Parent
+	}
+
 	for k := range flagSetAll {
 		out = append(out, k)
 	}
