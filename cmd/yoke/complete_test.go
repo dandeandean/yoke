@@ -23,7 +23,7 @@ func isSubset(a, b []string) bool {
 func TestCompFlags(t *testing.T) {
 	comps := getFlagCompletion(
 		[]string{"yoke", "descent", "-"},
-		validCommands["descent"],
+		CmdRoot.SubCommands["descent"],
 	)
 	cmpFlags := isSubset([]string{
 		"-debug",

@@ -8,25 +8,6 @@ import (
 	"strings"
 )
 
-// TODO: construct from rootcmd's children
-var validCommands = map[string]*YokeCommand{
-	// fake alias to the root command
-	"complete":   CmdRoot,
-	"yoke":       CmdRoot,
-	"atc":        CmdATC,
-	"takeoff":    CmdTakeoff,
-	"descent":    CmdDescent,
-	"mayday":     CmdMayday,
-	"blackbox":   CmdBlackbox,
-	"turbulence": CmdTurbulence,
-	"stow":       CmdStow,
-	"unlatch":    CmdUnlatch,
-	"schematics": CmdSchematics,
-	"sign":       CmdSign,
-	"verify":     CmdVerify,
-	"version":    CmdVersion,
-}
-
 func cleanArg(argIn string) string {
 	return argIn
 }
@@ -78,7 +59,7 @@ func getCommandCompletions(args []string) []*YokeCommand {
 		partial = ""
 	}
 	// We've already completed the command
-	cmd, ok := validCommands[partial]
+	cmd, ok := CmdRoot.SubCommands[partial]
 	if ok {
 		for _, c := range cmd.SubCommands {
 			fmt.Println("\t sub:", c.Name, partial, partial)
@@ -88,7 +69,7 @@ func getCommandCompletions(args []string) []*YokeCommand {
 		}
 		return out
 	}
-	for k, v := range validCommands {
+	for k, v := range CmdRoot.SubCommands {
 		if strings.HasPrefix(k, partial) {
 			out = append(out, v)
 		}
@@ -116,7 +97,7 @@ func Complete() {
 			lastCmdString = os.Args[len(os.Args)-2]
 		}
 		// partial was a full command, we should hop into a sub command completion
-		lastCmd, ok := validCommands[lastCmdString]
+		lastCmd, ok := CmdRoot.SubCommands[lastCmdString]
 		if ok {
 			// looking for the next command now
 			printFlagCompletion(os.Args, lastCmd)
