@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 )
 
 type YokeCommandRunner interface {
@@ -62,7 +63,7 @@ func NewCommand(name string, aliases []string, builder CmdBuilder) *YokeCommand 
 
 func Seek(args []string) (*YokeCommand, []string) {
 	cmdPtr := CmdRoot
-	var argsOut []string
+	var argsOut = args
 	for i, arg := range args {
 		nextCmd, ok := cmdPtr.SubCommands[arg]
 		if ok {

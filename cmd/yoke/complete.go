@@ -52,6 +52,9 @@ func getFlagCompletion(args []string, cmd *YokeCommand) []string {
 // given the args passed, yield all of the valid next top level cocmmands
 func getCommandCompletions(args []string) []*YokeCommand {
 	out := make([]*YokeCommand, 0)
+	if len(args) == 0 {
+		return out
+	}
 	partial := args[len(args)-1]
 	if partial == "complete" || partial == "yoke" {
 		partial = ""
@@ -62,8 +65,10 @@ func getCommandCompletions(args []string) []*YokeCommand {
 	if len(rest) == 0 {
 		partial = ""
 	}
+	fmt.Println("DEBUG: got to ", cmd.Name, "partial=", partial, "<-")
 	for k, v := range cmd.SubCommands {
 		if strings.HasPrefix(k, partial) || partial == "" {
+			fmt.Println("DEBUG: appending ", k)
 			out = append(out, v)
 		}
 	}
@@ -78,24 +83,27 @@ func printCommandCompletions(args []string) {
 
 func Complete() {
 	if len(os.Args) < 2 {
+		return
 	}
-	currentArgs := make(map[string]bool)
+	argSet := make(map[string]bool)
 	for _, arg := range os.Args {
-		currentArgs[arg] = true
+		argSet[arg] = true
 	}
-	partial := os.Args[len(os.Args)-1]
+	argsAfterComp := os.Args[2:]
+	if len(argsAfterComp) > 1 && argsAfterComp[0] == "yoke" {
+		argsAfterComp = argsAfterComp[1:]
+	}
+	fmt.Println("DEBUG: seeking for ", argsAfterComp)
+	cmd, rest := Seek(argsAfterComp)
+	fmt.Println("DEBUG: result for seek: ", cmd.Name, rest)
+	partial := ""
+	if len(rest) > 0 {
+		partial = rest[len(rest)-1]
+	}
+	fmt.Println("DEBUG: ", cmd.Name, rest, argsAfterComp)
 	if strings.HasPrefix(partial, "-") {
-		lastCmdString := ""
-		if len(os.Args) > 2 {
-			lastCmdString = os.Args[len(os.Args)-2]
-		}
-		// partial was a full command, we should hop into a sub command completion
-		lastCmd, ok := CmdRoot.SubCommands[lastCmdString]
-		if ok {
-			// looking for the next command now
-			printFlagCompletion(os.Args, lastCmd)
-		}
+		printFlagCompletion(rest, cmd)
 	}
 	//if it's not a full command, get top-level completions
-	printCommandCompletions(os.Args)
+	//printCommandCompletions(os.Args)
 }
