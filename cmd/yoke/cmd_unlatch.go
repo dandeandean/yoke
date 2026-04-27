@@ -31,6 +31,7 @@ var CmdUnlatch = NewCommand("unlatch", []string{"unlock"}, func(ctx context.Cont
 	flagset.StringVar(&params.Namespace, "namespace", "default", "target namespace of release to remove")
 
 	return flagset, func(ctx context.Context, settings GlobalSettings, args []string) error {
+		params.GlobalSettings = settings
 		RegisterGlobalFlags(flagset, &params.GlobalSettings)
 		flagset.Parse(args)
 		params.Release = flagset.Arg(0)
