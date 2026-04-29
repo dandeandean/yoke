@@ -46,16 +46,13 @@ func TestCompFlags(t *testing.T) {
 			Command: CmdDescent,
 			Args:    []string{"-"},
 			Wanted: []string{
-				"-debug",
-				"-kube-context",
+				"-lock",
 				"-namespace",
 				"-poll",
 				"-remove-all",
 				"-remove-crds",
-				"-wait",
-				"-kubeconfig",
-				"-lock",
 				"-remove-namespaces",
+				"-wait",
 			},
 		},
 		{
