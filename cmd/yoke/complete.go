@@ -19,7 +19,7 @@ func printFlagCompletion(args []string, cmd *YokeCommand) {
 }
 
 // get the flags associated with a yokeCommand
-// it takes all of args slice and the YokeCommand
+// it takes the args slice after the YokeCommand
 func getFlagCompletion(args []string, cmd *YokeCommand) []string {
 	flagSetAll := make(map[string]bool)
 	out := make([]string, 0)
@@ -29,7 +29,7 @@ func getFlagCompletion(args []string, cmd *YokeCommand) []string {
 	}
 	appendWithPrefix := func(f *flag.Flag, p string) {
 		if p == "" || strings.HasPrefix(f.Name, p) {
-			if !slices.Contains(args, f.Name) {
+			if !slices.Contains(args, "-"+f.Name) {
 				flagSetAll["-"+f.Name] = true
 			}
 		}
