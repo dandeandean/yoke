@@ -28,6 +28,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/cli-runtime/pkg/genericclioptions"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 
@@ -56,6 +57,10 @@ func TestMain(m *testing.M) {
 
 var (
 	background = internal.WithStdio(context.Background(), io.Discard, io.Discard, nil)
+	settings   = GlobalSettings{
+		Debug: new(bool),
+		Kube:  genericclioptions.NewConfigFlags(false),
+	}
 )
 
 func createBasicDeployment(t *testing.T, name, namespace string) io.Reader {

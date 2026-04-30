@@ -81,6 +81,19 @@ func Complete() {
 	if len(os.Args) < 2 {
 		return
 	}
+	if _, ok := os.LookupEnv("COMP_LINE"); !ok {
+		fmt.Print(`
+# Please add the following to your bashrc file
+
+function _yoke() {
+  COMPREPLY=($(yoke complete $COMP_LINE));
+};
+
+complete -F _yoke yoke
+`)
+		return
+	}
+
 	argSet := make(map[string]bool)
 	for _, arg := range os.Args {
 		argSet[arg] = true

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"slices"
 	"testing"
 )
@@ -22,6 +21,7 @@ func isSubset(a, b []string) bool {
 }
 
 func TestCompFlags(t *testing.T) {
+	t.Setenv("COMP_LINE", "")
 	for _, comp := range []struct {
 		Command *YokeCommand
 		Args    []string
@@ -151,6 +151,7 @@ func TestCompFlags(t *testing.T) {
 }
 
 func TestCompFlagDuplicates(t *testing.T) {
+	t.Setenv("COMP_LINE", "")
 	for _, comp := range []struct {
 		Comp      []string
 		Command   *YokeCommand
@@ -170,7 +171,6 @@ func TestCompFlagDuplicates(t *testing.T) {
 	} {
 		compLine := getFlagCompletion(comp.Args, comp.Command)
 		for _, unwanted := range comp.NotInComp {
-			fmt.Println(comp.Command.Name, comp.Args, "->", compLine)
 			if slices.Contains(compLine, unwanted) {
 				t.Fatalf("got unexpected flag completion for %s with args %v: got %v", comp.Command.Name, comp.Args, compLine)
 			}

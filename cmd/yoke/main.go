@@ -47,11 +47,6 @@ var CmdRoot = NewCommand("yoke", []string{}, func(ctx context.Context) (*flag.Fl
 	return flagset, runner
 })
 
-var settings = GlobalSettings{
-	Debug: new(bool),
-	Kube:  genericclioptions.NewConfigFlags(false),
-}
-
 func init() {
 	CmdRoot.AddCommand(CmdATC)
 	CmdRoot.AddCommand(CmdBlackbox)
@@ -68,6 +63,10 @@ func init() {
 }
 
 func run() error {
+	settings := GlobalSettings{
+		Debug: new(bool),
+		Kube:  genericclioptions.NewConfigFlags(false),
+	}
 
 	if len(os.Args) > 1 && os.Args[1] == "complete" {
 		Complete()
