@@ -7,40 +7,22 @@ import (
 
 // TestCmdSubs asserts that all of the expected sub commands are in place
 func TestCmdSubs(t *testing.T) {
-	// this is dumb
 	validCommands := []string{
-		"atc",
-		"mayday",
-		"unlatch",
-		"schematics",
-		"verify",
-		"version",
-		"takeoff",
-		"descent",
-		"blackbox",
-		"turbulence",
-		"stow",
-		"sign",
-		"inspect",
-		"push",
-		"drift",
-		"diff",
-		"delete",
-		"meta",
-		"apply",
-		"up",
-		"down",
-		"restore",
-		"unlock",
+		"apply", "atc", "blackbox",
+		"delete", "descent", "diff",
+		"down", "drift", "inspect",
+		"mayday", "meta", "push",
+		"restore", "schematics", "sign",
+		"stow", "takeoff", "turbulence",
+		"unlatch", "unlock", "up",
+		"verify", "version",
 	}
 	for _, cmd := range validCommands {
-		t.Logf("Checking SubCommand for root: %v", cmd)
 		if _, ok := CmdRoot.SubCommands[cmd]; !ok {
 			t.Fatalf("expected %s to be a subcommand of the root command", cmd)
 		}
 	}
 	for _, cmd := range []string{"ls", "set", "get"} {
-		t.Logf("Checking SubCommand for schematics %v", cmd)
 		if _, ok := CmdSchematics.SubCommands[cmd]; !ok {
 			t.Fatalf("expected %s to be a subcommand of the schematics command", cmd)
 		}
@@ -68,7 +50,6 @@ func TestCmdSeekRunner(t *testing.T) {
 	}
 	for _, s := range tests {
 		cmd, _ := Seek(s.Args)
-		t.Logf("Checking runner for %v", s.Args)
 		if reflect.ValueOf(cmd.Runner) != reflect.ValueOf(s.Want) {
 			t.Fatalf("got function mismatch for %v", s.Args)
 		}
